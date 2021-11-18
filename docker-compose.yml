@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  db:
+    container_name: psql_store
+    restart: always
+    image: psql
+    build:
+      context: ./db
+    environment:
+      POSTGRES_DATABASE: store_database
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db:/var/lib/postgresql/data
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    networks:
+      - network
+
+  graphql:
+    container_name: grapql_store
+    restart: always
+    image: graphile/postgraphile
+    build:
+      context: ./graphql
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+    networks:
+      - network
+    expose:
+      - 5000
+    ports:
+      - 5000:5000
+    command: ["--connection", "${DATABASE_URL}", "--port", "5000", "--schema", "store_schema" ]
+
+networks:
+  network:
+
+volumes:
+  db:
