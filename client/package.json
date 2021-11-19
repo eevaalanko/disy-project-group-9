@@ -1,0 +1,14 @@
+{
+  "name": "store_web_app",
+  "version": "1.0.0",
+  "description": "Distributed systems fall 2021 project",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.16.1",
+    "graphql": "^15.3.0",
+    "apollo-server": "^2.18.2"
+  }
+}

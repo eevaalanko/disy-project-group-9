@@ -16,7 +16,7 @@ services:
     expose:
       - 5432
     ports:
-      - 5432:5432
+      - "5432:5432"
     networks:
       - network
 
@@ -32,11 +32,17 @@ services:
       - db
     networks:
       - network
-    expose:
-      - 5000
     ports:
-      - 5000:5000
-    command: ["--connection", "${DATABASE_URL}", "--port", "5000", "--schema", "store_schema" ]
+      - "5000:5000"
+    command: ["--connection", "${DATABASE_URL}", "--host", "0.0.0.0", "--port", "5000", "--schema", "store_schema" ]
+
+  client:
+    container_name: client_store
+    restart: always
+    build:
+      context: ./client
+    ports:
+      - "8080:8080"
 
 networks:
   network:

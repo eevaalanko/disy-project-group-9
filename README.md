@@ -4,6 +4,7 @@
 
 ###### Build and run all containers:
 ```
-docker-compose up
+docker compose up
 ```
+
 
