@@ -1,0 +1,83 @@
+const {ApolloServer, gql} = require('apollo-server')
+const mongoose = require('mongoose')
+const jwt = require('jsonwebtoken')
+
+const JWT_SECRET = 'NEED_HERE_A_SECRET_KEY'
+
+const Item = require('./models/item')
+
+// init data
+Item.insertMany([{name: 'Item1', amount: 3, prize: 1000}, {name: 'Item2', amount: 1, prize: 5}], function (err) {
+    console.log('Item init failed:', err.message)
+})
+
+const User = require('./models/user')
+const MONGODB_URI =
+    'mongodb://root:example@mongo:27017/'
+
+console.log('connecting to', MONGODB_URI)
+
+mongoose.connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+})
+    .then(() => {
+        console.log('connected to MongoDB')
+    })
+    .catch((error) => {
+        console.log('error connection to MongoDB:', error.message)
+    })
+
+const typeDefs = gql`
+  type Item {
+    name: String
+    id: ID!
+    price: Int
+    amount: Int
+  }
+  type User {
+    username: String!
+    id: ID!
+  }
+  type Token {
+    value: String!
+  }
+  type Query {
+    me: User
+    allItems: [Item!]!
+  }
+`
+
+const resolvers = {
+    Query: {
+        allItems: async () => {
+            const items = await Item.find({})
+            return items.map(i => ({id: i.id, name: i.name, price: i.price, amount: i.amount}))
+        },
+        me: (root, args, context) => {
+            return context.currentUser
+        },
+    },
+
+}
+
+const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: async ({req}) => {
+        const auth = req ? req.headers.authorization : null
+        if (auth && auth.toLowerCase().startsWith('bearer ')) {
+            const decodedToken = jwt.verify(auth.substring(7), JWT_SECRET)
+            const currentUser = await User.findById(decodedToken.id)
+            return {currentUser}
+        }
+    },
+})
+
+
+server.listen(4000).then(({url, subscriptionsUrl}) => {
+    console.log(`Server ready at ${url}`)
+    console.log(`Subscriptions ready at ${subscriptionsUrl}`)
+})
