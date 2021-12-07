@@ -21,7 +21,7 @@ mongoose.connect(MONGODB_URI, {
 });
 
 // init data
-Item.insertMany([{name: 'Item1', amount: 3, prize: 1000}, {name: 'Item2', amount: 1, prize: 5}], function (err) {
+Item.insertMany([{name: 'Item1', amount: 3, price: 1000}, {name: 'Item2', amount: 1, price: 5}], function (err) {
     console.log('Item init failed:', err)
 })
 
