@@ -5,7 +5,7 @@ const GetItems = () => {
   const { data } = useQuery(ALL_ITEMS, {
     fetchPolicy: 'cache-and-network',
   })
-  return data ? data.getItems : undefined
+  return data ? data : undefined
 }
 
 export default GetItems

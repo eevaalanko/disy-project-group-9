@@ -4,7 +4,6 @@ import {setContext} from 'apollo-link-context'
 import {
     ApolloClient,
     ApolloProvider, createHttpLink,
-    HttpLink,
     InMemoryCache,
     split
 } from '@apollo/client'
@@ -30,7 +29,6 @@ const authLink = setContext((_, {headers}) => {
 
 const httpLink = createHttpLink({
     uri: `http://192.168.99.101:4000`,
-    credentials: 'include'
 });
 
 const wsLink = new WebSocketLink({
@@ -55,9 +53,6 @@ const splitLink = split(
 const client = new ApolloClient({
     cache: new InMemoryCache(),
     link: splitLink,
-    fetchOptions: {
-     //   mode: 'no-cors',   // TODO: remove when authorization is set
-    },
 })
 
 ReactDOM.render(

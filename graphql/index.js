@@ -1,34 +1,30 @@
 const {ApolloServer, gql} = require('apollo-server')
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
-
 const JWT_SECRET = 'NEED_HERE_A_SECRET_KEY'
-
 const Item = require('./models/item')
 
-// init data
-Item.insertMany([{name: 'Item1', amount: 3, prize: 1000}, {name: 'Item2', amount: 1, prize: 5}], function (err) {
-    console.log('Item init failed:', err.message)
-})
+
 
 const User = require('./models/user')
-const MONGODB_URI =
-    'mongodb://root:example@mongo:27017/'
+
+const MONGODB_URI = "mongodb://root:example@mongo:27017/"
 
 console.log('connecting to', MONGODB_URI)
 
 mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-    useCreateIndex: true,
+    useUnifiedTopology: true
+}, err => {
+    if (err) throw err;
+    console.log('Connected to MongoDB!!!')
+});
+
+// init data
+Item.insertMany([{name: 'Item1', amount: 3, prize: 1000}, {name: 'Item2', amount: 1, prize: 5}], function (err) {
+    console.log('Item init failed:', err)
 })
-    .then(() => {
-        console.log('connected to MongoDB')
-    })
-    .catch((error) => {
-        console.log('error connection to MongoDB:', error.message)
-    })
+
 
 const typeDefs = gql`
   type Item {
@@ -60,12 +56,12 @@ const resolvers = {
             return context.currentUser
         },
     },
-
 }
 
 const server = new ApolloServer({
     typeDefs,
     resolvers,
+    cors: true,
     context: async ({req}) => {
         const auth = req ? req.headers.authorization : null
         if (auth && auth.toLowerCase().startsWith('bearer ')) {
@@ -75,7 +71,6 @@ const server = new ApolloServer({
         }
     },
 })
-
 
 server.listen(4000).then(({url, subscriptionsUrl}) => {
     console.log(`Server ready at ${url}`)
