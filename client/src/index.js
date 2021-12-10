@@ -12,12 +12,10 @@ import {getMainDefinition} from '@apollo/client/utilities'
 import {WebSocketLink} from '@apollo/client/link/ws'
 import App from "./components/App";
 
-require('dotenv').config();  // doesn't work...
-const GRAPHQL_URL = "192.168.99.101:4000/graphql" // TODO: move to .env file
-
+require('dotenv').config();
 
 const authLink = setContext((_, {headers}) => {
-    const token = localStorage.getItem('library-user-token')
+    const token = localStorage.getItem('store-user-token')
     return {
         headers: {
             ...headers,
@@ -26,13 +24,12 @@ const authLink = setContext((_, {headers}) => {
     }
 })
 
-
 const httpLink = createHttpLink({
     uri: `http://192.168.99.101:4000`,
 });
 
 const wsLink = new WebSocketLink({
-    uri: `ws://${GRAPHQL_URL}`,
+    uri: `ws://${process.env.GRAPHQL_SERVER_URL}/graphql`,
     options: {
         reconnect: true
     }
