@@ -1,6 +1,4 @@
-
-const { ApolloServer, gql } = require('apollo-server-express')
-const express = require('express')
+const {ApolloServer, gql} = require('apollo-server')
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const JWT_SECRET = 'NEED_HERE_A_SECRET_KEY'
@@ -8,9 +6,6 @@ const socketio = require('socket.io')
 
 const Item = require('./models/item')
 const User = require('./models/user')
-
-// Initalizes the app server
-const app = express()
 
 const MONGODB_URI = "mongodb://root:example@mongo:27017/"
 
@@ -28,7 +23,6 @@ mongoose.connect(MONGODB_URI, {
 Item.insertMany([{name: 'Item1', amount: 3, price: 1000}, {name: 'Item2', amount: 1, price: 5}], function (err) {
     console.log('Item init failed:', err)
 })
-
 
 const typeDefs = gql`
   type Item {
@@ -76,18 +70,9 @@ const server = new ApolloServer({
     },
 })
 
-
-server.applyMiddleware({ app });
-
-
-// Listen to port 5000, save on const to attach io to it
-const http = app.listen(4000).then(({url, subscriptionsUrl}) => {
+server.listen(4000).then(({url, subscriptionsUrl}) => {
     console.log(`Server ready at ${url}`)
     console.log(`Subscriptions ready at ${subscriptionsUrl}`)
 })
 
-// Attach socket.io to the server instance
-const io = socketio(http)
-io.on('connection', (socket) => {
-    // TODO: related io code: connection to login server
-})
+// Todo: implement working socket connection with socket.io when login server is done
