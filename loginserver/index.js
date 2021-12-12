@@ -3,7 +3,6 @@ const { ApolloServerPluginDrainHttpServer } = require('apollo-server-core');
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const JWT_SECRET = 'NEED_HERE_A_SECRET_KEY'
-const socketio = require('socket.io')
 const express = require('express');
 
 const User = require('./models/user')
@@ -68,9 +67,14 @@ async function startApolloServer() {
 
     await new Promise(resolve => httpServer.listen({ port: 4001 }, resolve));
     console.log(`🚀 Server ready at http://localhost:4001${server.graphqlPath}`);
-    const io = require('socket.io')(httpServer);
+    const io = require('socket.io')(httpServer, {
+        cors: {
+            origin: "http://192.168.99.101:3001",
+            methods: ["GET", "POST"]
+        }
+    });
     io.on("connection", (socket) => {
-        console.log("Connected, socket: ", socket);
+        console.log("Connected to login server, socket: ", socket);
         // your code
         socket.data.username = "alice";
     });

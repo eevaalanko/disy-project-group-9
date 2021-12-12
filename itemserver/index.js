@@ -1,9 +1,8 @@
 const {ApolloServer, gql} = require('apollo-server-express');
-const { ApolloServerPluginDrainHttpServer } = require('apollo-server-core');
+const {ApolloServerPluginDrainHttpServer} = require('apollo-server-core');
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const JWT_SECRET = 'NEED_HERE_A_SECRET_KEY'
-const socketio = require('socket.io')
 const express = require('express');
 
 const Item = require('./models/item')
@@ -65,7 +64,7 @@ async function startApolloServer() {
     const server = new ApolloServer({
         typeDefs,
         resolvers,
-        plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+        plugins: [ApolloServerPluginDrainHttpServer({httpServer})],
         cors: true,
         context: async ({req}) => {
             const auth = req ? req.headers.authorization : null
@@ -79,11 +78,16 @@ async function startApolloServer() {
 
     await server.start();
 
-    server.applyMiddleware({ app })
+    server.applyMiddleware({app})
 
-    await new Promise(resolve => httpServer.listen({ port: 4000 }, resolve));
+    await new Promise(resolve => httpServer.listen({port: 4000}, resolve));
     console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
-    const io = require('socket.io')(httpServer);
+    const io = require('socket.io')(httpServer, {
+        cors: {
+            origin: "http://192.168.99.101:3000",
+            methods: ["GET", "POST"]
+        }
+    });
     io.on("connection", (socket) => {
         console.log("Connected, socket: ", socket);
         // your code
@@ -91,12 +95,11 @@ async function startApolloServer() {
     const sockets = await io.fetchSockets();
     console.log("test!!!!!!!", sockets[0]); // "alice"
 
-    return { server, app };
+    return {server, app};
 
 }
 
 startApolloServer()
-
 
 
 // Todo: implement working socket connection with socket.io when login server is done
