@@ -27,7 +27,7 @@ const authLink = setContext((_, {headers}) => {
 })
 
 const httpLink = createHttpLink({
-    uri: `http://${GRAPHQL_SERVER_URL}`,
+    uri: `http://${GRAPHQL_SERVER_URL}/graphql`,
 });
 
 const wsLink = new WebSocketLink({
