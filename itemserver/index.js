@@ -22,8 +22,11 @@ mongoose.connect(MONGODB_URI, {
 });
 
 // init data
-Item.insertMany([{name: 'Item1', amount: 3, price: 1000}, {name: 'Item2', amount: 1, price: 5}], function (err) {
+Item.insertMany([{name: 'Item1', amount: 3, price: 1000}, {name: 'Item2', amount: 1, price: 5}, {name: 'Item3', amount: 1, price: 5}], function (err) {
     console.log('Item init failed:', err)
+})
+User.insertMany([{username: 'Matti', password: 'kissa123'}, {username: 'Mervi', password: 'kissa123'}], function (err) {
+    console.log('User init failed:', err)
 })
 
 const typeDefs = gql`
@@ -36,6 +39,7 @@ const typeDefs = gql`
   type User {
     username: String!
     id: ID!
+    password: String!
   }
   type Token {
     value: String!
@@ -43,6 +47,15 @@ const typeDefs = gql`
   type Query {
     me: User
     allItems: [Item!]!
+    allUsers: [User!]!
+  }
+  input ItemInput {
+    name: String
+    price: Int
+    amount: Int
+  }
+  type Mutation {
+    postItem(itemInput: ItemInput): Item
   }
 `
 
@@ -55,6 +68,17 @@ const resolvers = {
         me: (root, args, context) => {
             return context.currentUser
         },
+        allUsers: async () => {
+            const users = await User.find({})
+            return users.map(i => ({id: i.id, username: i.username, password: i.password}))
+        },
+    },
+    Mutation: {
+        postItem:(parent, args) => {
+            let item = new Item(args.itemInput)
+            return item.save()
+        },
+
     },
 }
 
@@ -84,7 +108,7 @@ async function startApolloServer() {
     console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
     const io = require('socket.io')(httpServer, {
         cors: {
-            origin: "http://192.168.99.101:3000",
+            origin: "http://127.0.0.1:3000",
             methods: ["GET", "POST"]
         }
     });

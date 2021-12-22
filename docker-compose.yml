@@ -52,7 +52,7 @@ services:
     container_name: store_client
     restart: always
     environment:
-      - GRAPHQL_SERVER_URL=192.168.99.101:4000
+      - GRAPHQL_SERVER_URL=127.0.0.1:4000
     build:
       context: client
     volumes:

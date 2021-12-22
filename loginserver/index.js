@@ -20,6 +20,11 @@ mongoose.connect(MONGODB_URI, {
     console.log('Connected to MongoDB with login server!!!')
 });
 
+// init data
+//User.insertMany([{username: 'Matti', password: 'kissa123'}, {username: 'Mervi', password: 'kissa123'}], function (err) {
+//    console.log('User init failed:', err)
+//})
+
 
 
 const typeDefs = gql`
@@ -69,7 +74,7 @@ async function startApolloServer() {
     console.log(`🚀 Server ready at http://localhost:4001${server.graphqlPath}`);
     const io = require('socket.io')(httpServer, {
         cors: {
-            origin: "http://192.168.99.101:3001",
+            origin: "http://127.0.0.1:3000",
             methods: ["GET", "POST"]
         }
     });

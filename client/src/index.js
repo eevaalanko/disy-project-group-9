@@ -11,9 +11,11 @@ import {
 import {getMainDefinition} from '@apollo/client/utilities'
 import {WebSocketLink} from '@apollo/client/link/ws'
 import App from "./components/App";
+import ItemForm from "./components/ItemForm";
+import LoginForm from "./components/LoginForm";
 
 require('dotenv').config();  // doesn't work...
-const GRAPHQL_SERVER_URL = "192.168.99.101:4000" // TODO: move to .env file
+const GRAPHQL_SERVER_URL = "127.0.0.1:4000" // TODO: move to .env file
 
 
 const authLink = setContext((_, {headers}) => {
@@ -28,7 +30,7 @@ const authLink = setContext((_, {headers}) => {
 
 const httpLink = createHttpLink({
     uri: `http://${GRAPHQL_SERVER_URL}/graphql`,
-});
+})
 
 const wsLink = new WebSocketLink({
     uri: `ws://${GRAPHQL_SERVER_URL}/graphql`,
@@ -56,6 +58,9 @@ const client = new ApolloClient({
 
 ReactDOM.render(
     <ApolloProvider client={client}>
+        <LoginForm/>
+        <br/>
+        <ItemForm/>
         <App/>
     </ApolloProvider>,
     document.getElementById('root')
